@@ -109,7 +109,7 @@ export default function ConversationDetailPage({ params }: { params: { id: strin
             </Button>
           </div>
           <p className="text-xs text-muted-foreground mt-2">
-            This is a read-only view of the conversation. Messages sent here won't be delivered to the user.
+            This is a read-only view of the conversation. Messages sent here won&apos;t be delivered to the user.
           </p>
         </div>
       </div>

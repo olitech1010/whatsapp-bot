@@ -149,7 +149,8 @@ export function FileUpload({
     useDropzone({
       onDrop,
       disabled,
-      ...dropzoneOptions,
+      // Type assertion to fix compatibility issue
+      ...(dropzoneOptions as any),
     });
 
   React.useEffect(() => {

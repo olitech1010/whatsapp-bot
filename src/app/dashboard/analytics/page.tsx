@@ -1,6 +1,5 @@
 import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 // Sample data for charts
 const messageData = [
@@ -92,15 +91,10 @@ export default function AnalyticsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={messageData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="messages" fill="#3b82f6" />
-                </BarChart>
-              </ResponsiveContainer>
+              <div className="flex flex-col h-full justify-center items-center text-muted-foreground">
+                <p>Chart visualization temporarily unavailable</p>
+                <p className="text-sm mt-2">Data: {messageData.map(d => `${d.name}: ${d.messages}`).join(', ')}</p>
+              </div>
             </CardContent>
           </Card>
 
@@ -112,15 +106,10 @@ export default function AnalyticsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={botUsageData} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis type="number" />
-                  <YAxis dataKey="name" type="category" width={150} />
-                  <Tooltip />
-                  <Bar dataKey="usage" fill="#10b981" />
-                </BarChart>
-              </ResponsiveContainer>
+              <div className="flex flex-col h-full justify-center items-center text-muted-foreground">
+                <p>Chart visualization temporarily unavailable</p>
+                <p className="text-sm mt-2">Data: {botUsageData.map(d => `${d.name}: ${d.usage}`).join(', ')}</p>
+              </div>
             </CardContent>
           </Card>
         </div>
