@@ -1,0 +1,134 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  accounts      Account[]
+  bots          Bot[]
+  subscription  Subscription?
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Bot {
+  id                String         @id @default(cuid())
+  name              String
+  description       String?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  userId            String
+  user              User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  settings          BotSettings?
+  whatsappSessions  WhatsappSession[]
+  conversations     Conversation[]
+  vectorDocuments   VectorDocument[]
+}
+
+model BotSettings {
+  id                String   @id @default(cuid())
+  botId             String   @unique
+  bot               Bot      @relation(fields: [botId], references: [id], onDelete: Cascade)
+  openaiApiKey      String?
+  openaiModel       String   @default("gpt-3.5-turbo")
+  embeddingModel    String   @default("text-embedding-ada-002")
+  companyName       String?
+  companyWebsite    String?
+  welcomeMessage    String?
+  vectorDbProvider  String   @default("mongodb")
+  scrapingInterval  Int      @default(24) // hours
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model WhatsappSession {
+  id                String   @id @default(cuid())
+  botId             String
+  bot               Bot      @relation(fields: [botId], references: [id], onDelete: Cascade)
+  sessionData       String?  @db.Text
+  qrCode            String?  @db.Text
+  status            String   @default("disconnected") // disconnected, connected, connecting
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Conversation {
+  id                String    @id @default(cuid())
+  botId             String
+  bot               Bot       @relation(fields: [botId], references: [id], onDelete: Cascade)
+  whatsappNumber    String
+  messages          Message[]
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([botId, whatsappNumber])
+}
+
+model Message {
+  id                String       @id @default(cuid())
+  conversationId    String
+  conversation      Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  content           String       @db.Text
+  role              String       // user, assistant
+  createdAt         DateTime     @default(now())
+
+  @@index([conversationId])
+}
+
+model VectorDocument {
+  id                String   @id @default(cuid())
+  botId             String
+  bot               Bot      @relation(fields: [botId], references: [id], onDelete: Cascade)
+  source            String   // url, pdf, manual
+  title             String?
+  content           String   @db.Text
+  vectorId          String?  // ID in the vector database
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([botId])
+}
+
+model Subscription {
+  id                String    @id @default(cuid())
+  userId            String    @unique
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stripeCustomerId  String?   @unique
+  stripeSubscriptionId String? @unique
+  stripePriceId     String?
+  stripeCurrentPeriodEnd DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
